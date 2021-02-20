@@ -2,6 +2,8 @@ import requests
 import pandas as pd 
 from bs4 import BeautifulSoup
 import re
+import pymongo
+
 
 def read_news( headers, a):
     scarped_data=[]
@@ -28,6 +30,7 @@ def read_news( headers, a):
                 for d in date:
                     news_detail['news_date'] = d.text
                 scarped_data.append(news_detail)
+
     return scarped_data
 
 
@@ -50,3 +53,11 @@ scarped_data = read_news(headers, a)
 
 dataframe=pd.DataFrame.from_dict(scarped_data)
 dataframe.to_csv('news_data_2.csv',index=False)
+
+import pymongo
+
+client = pymongo.MongoClient("mongodb://localhost:27017/")
+
+database = client["news"]
+people_collection = database[ "hamshahri" ]
+result=people_collection.insert_many(scarped_data)
