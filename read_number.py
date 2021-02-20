@@ -1,19 +1,13 @@
 import requests
 import pandas as pd 
 from bs4 import BeautifulSoup
-headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0' }
-scarped_data=[]
 import re
-a = []
-url_2 = "https://newspaper.hamshahrionline.ir/?n="
-url = 'https://newspaper.hamshahrionline.ir/archive'
-response_1= requests.request("GET",url=url,headers=headers)
-data_1 = BeautifulSoup(response_1.text,'html.parser')
-for link in data_1.findAll('a', attrs={'href': re.compile("^/archive")}):
-    a.append(link.get('href'))
-    news_month_id=[]
-      
-for p in a:
+
+def read_news( headers, a):
+    scarped_data=[]
+    url_2 = "https://newspaper.hamshahrionline.ir/?n="
+
+    for p in a:
         print(p)
         url = 'https://newspaper.hamshahrionline.ir'+ p
         response_2 = requests.request("GET",url=url,headers=headers)
@@ -27,7 +21,6 @@ for p in a:
             data_3 = BeautifulSoup(response_3.text,'html.parser')
             news_data = data_3.find_all('div',attrs={'class','text'})
             date = data_3.find_all('li',attrs={'class','dir-left'})
-
             for news in news_data:
                 news_detail={}
                 #print (news)
@@ -35,8 +28,25 @@ for p in a:
                 for d in date:
                     news_detail['news_date'] = d.text
                 scarped_data.append(news_detail)
-                dataframe=pd.DataFrame.from_dict(scarped_data)
-                dataframe.to_csv('news_data_2.csv',index=False)
-    #scarped_data.append(news_detail)
+    return scarped_data
+
+
+def read_archive():
+    url = 'https://newspaper.hamshahrionline.ir/archive'
+    headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0' }
+    a = []
+    response_1= requests.request("GET",url=url,headers=headers)
+    data_1 = BeautifulSoup(response_1.text,'html.parser')
+    for link in data_1.findAll('a', attrs={'href': re.compile("^/archive")}):
+        a.append(link.get('href'))
+        news_month_id=[]
+    return headers,a
+
+
+
+
+headers, a = read_archive()
+scarped_data = read_news(headers, a)
+
 dataframe=pd.DataFrame.from_dict(scarped_data)
 dataframe.to_csv('news_data_2.csv',index=False)
