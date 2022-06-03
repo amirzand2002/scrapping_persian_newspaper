@@ -1,4 +1,5 @@
-# web_scrapping_py
+# scrapping_persian_newspaper
+
 
 ## A project to gather Iranian newspaper news from their archive
 
